@@ -12,6 +12,7 @@ class Project(Base):
     is_public = Column(Boolean, default=True)
 
     owner = relationship("User", backref="projects")
+    stack = relationship("ProjectStack", back_populates="project", uselist=False)
 
     def __repr__(self):
         return f"<Project(name={self.name}, owner_id={self.owner_id})>"

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: tdt_user
+      POSTGRES_PASSWORD: tdt_pass
+      POSTGRES_DB: tdt_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://tdt_user:tdt_pass@db:5432/tdt_db
+      SECRET_KEY: 3d473b7d5d76d34cfcdf4d103ae1bb5cbbc8d9c924b6e2c874f8936f02a43e58
+    depends_on:
+      - db
+    command: sh -c "sleep 5 && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  postgres_data:

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import auth, projects, tasks
+from app.routes import auth, projects, tasks, cicd
 from app.core.dependencies import get_current_user
 from app.models.user import User
 from fastapi import Depends
@@ -11,6 +11,7 @@ app = FastAPI(title="Task & Deployment Tracker API")
 app.include_router(auth.router)
 app.include_router(projects.router)
 app.include_router(tasks.router)
+app.include_router(cicd.router)
 
 @app.get("/")
 def root():
