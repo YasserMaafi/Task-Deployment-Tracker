@@ -47,7 +47,7 @@ class CICDService:
             ai_record.output_content = yaml_result
             ai_record.status = "completed"
             ai_record.completed_at = datetime.utcnow()
-            ai_record.model_used = "stub"
+            ai_record.model_used = "gemini-pro"
 
         except Exception as e:
             # 6️⃣ Handle failure

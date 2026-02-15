@@ -1,11 +1,11 @@
 from fastapi import Depends
-from .provider_openai import OpenAIProvider
+from .provider_gemini import GeminiProvider
 from .base import AIProvider
 from .cicd_generator import CICDGenerator
 
 
 def get_ai_provider() -> AIProvider:
-    return OpenAIProvider()
+    return GeminiProvider()
 
 
 def get_cicd_generator(
