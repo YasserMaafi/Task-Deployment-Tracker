@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.db.database import get_session
 from app.models.project import Project
 from app.models.user import User
 from app.core.dependencies import get_current_user
+from app.services.permissions import PermissionService
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -47,9 +48,10 @@ async def get_project(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    if not project.is_public:
-        if project.owner_id != current_user.id and current_user.role != "admin":
-            raise HTTPException(status_code=403, detail="This project is private")
+    # Use new permission system
+    can_access = await PermissionService.can_access_project(current_user, project, db)
+    if not can_access:
+        raise HTTPException(status_code=403, detail="Access denied")
     
     return project
 
@@ -66,7 +68,9 @@ async def update_project(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    if project.owner_id != current_user.id and current_user.role != "admin":
+    # Use new permission system
+    can_modify = await PermissionService.can_modify_project(current_user, project, db)
+    if not can_modify:
         raise HTTPException(status_code=403, detail="Not authorized to modify this project")
     
     if project_data.name:
@@ -90,6 +94,7 @@ async def delete_project(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
+    # Only owner or admin can delete
     if project.owner_id != current_user.id and current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized to delete this project")
     

@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.ai.cicd_generator import CICDGenerator
 from app.models.ai_generation import AIGeneration
 from app.models.project_stack import ProjectStack
+from app.services.permissions import PermissionService
 
 
 class CICDService:
@@ -11,13 +12,14 @@ class CICDService:
         self.generator = generator
 
     async def generate_pipeline(self, project, user, db_session: AsyncSession):
-        # 1️⃣ Permission check
-        if project.owner_id != user.id and user.role != "admin":
-            raise PermissionError("Only project owner or admin can generate CI/CD pipelines.")
+        # 1️⃣ Permission check using new group-based permissions
+        can_generate = await PermissionService.can_generate_cicd(user, project, db_session)
+        if not can_generate:
+            raise PermissionError(
+                "Only project members (students, supervisors, owner, or admin) can generate CI/CD pipelines."
+            )
 
         # 2️⃣ Get project stack data
-        # For now, we'll pass basic project info
-        # Later this will fetch from ProjectStack model
         stack_data = {
             "project_name": project.name,
             "description": project.description
@@ -40,14 +42,13 @@ class CICDService:
 
         try:
             # 4️⃣ Call CICDGenerator
-            # Currently returns stub YAML
             yaml_result = await self.generator.generate_github_actions_yaml(stack_data)
 
             # 5️⃣ Update record with output
             ai_record.output_content = yaml_result
             ai_record.status = "completed"
             ai_record.completed_at = datetime.utcnow()
-            ai_record.model_used = "gemini-pro"
+            ai_record.model_used = "stub-provider"
 
         except Exception as e:
             # 6️⃣ Handle failure

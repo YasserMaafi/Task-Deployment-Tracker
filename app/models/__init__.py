@@ -5,6 +5,9 @@ from app.models.deployment import Deployment
 from app.models.activity import TaskActivity
 from app.models.project_stack import ProjectStack
 from app.models.ai_generation import AIGeneration
+from app.models.project_students import project_students
+from app.models.project_supervisors import project_supervisors
+from app.models.project_feedback import ProjectFeedback
 
 __all__ = [
     "User",
@@ -14,4 +17,7 @@ __all__ = [
     "TaskActivity",
     "ProjectStack",
     "AIGeneration",
+    "project_students",
+    "project_supervisors",
+    "ProjectFeedback",
 ]

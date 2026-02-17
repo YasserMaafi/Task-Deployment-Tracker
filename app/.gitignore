@@ -1,4 +1,32 @@
-venv/
+# Python
 __pycache__/
-*.env
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Database
+*.db
+*.sqlite
+
+# Alembic
+alembic/__pycache__/
+alembic/versions/__pycache__/
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
